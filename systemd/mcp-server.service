@@ -1,0 +1,39 @@
+[Unit]
+Description=MCP Server — lightweight Model Context Protocol wrapper around CLI security tools
+After=network.target
+Documentation=https://github.com/your-repo/mcp-server
+Wants=network-online.target
+
+# Low-memory tuning for Raspberry Pi Zero W (512 MB RAM)
+MemoryMax=50M
+MemorySwapMax=0
+
+# Restart on failure; avoid restart looping too fast
+Restart=on-failure
+RestartSec=5
+
+# Security: drop privileges after binding to the configured address
+# The server drops to the "mcp" user below
+ProtectSystem=strict
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Service]
+Type=simple
+# Don't let systemd split CPUs; keep single-threaded
+CPUQuota=100%
+ExecStart=/usr/bin/python3 /opt/mcp-server/server.py /opt/mcp-server/config.example.toml
+# Ensure the working directory is writable for SQLite state
+WorkingDirectory=/opt/mcp-server
+# Reduce startup latency
+TimeoutStartSec=30
+# Log level
+StandardOutput=journal
+StandardError=journal
+
+# Drop privileges after binding
+User=mcp
+Group=mcp
+
+[Install]
+WantedBy=multi-user.target

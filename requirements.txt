@@ -1,0 +1,18 @@
+# Lightweight MCP server for Raspberry Pi Zero W
+# Standard library only — no heavy runtime deps needed.
+
+# The server uses only Python 3 standard library modules:
+#   - asyncio   (event loop, subprocess, waits)
+#   - json      (RPC message parsing)
+#   - sqlite3 (job state persistence)
+#   - uuid      (job IDs)
+#   - datetime (timestamps)
+#   - pathlib   (path handling)
+#   - os        (environment, file ops)
+
+# Optional: mcp SDK if you want to conform to the official Model Context Protocol
+# package instead of the stdio-based compatible implementation included here.
+# pip install mcp-sdk  # <-- uncomment if using the external SDK
+
+# System dependencies (ensure installed on Pi Zero OS Lite 32-bit):
+#   - nmap, whatweb, dnsutils, curl, subfinder

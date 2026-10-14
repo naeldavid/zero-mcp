@@ -1,0 +1,136 @@
+# MCP Server Configuration — Raspberry Pi Zero W friendly
+# Edit this file to enable/disable tools, set binary paths, and adjust timeouts.
+
+[network]
+# Network interface / address the MCP server binds to.
+# Options: "local" (127.0.0.1), "wlan0" (Pi's IP), "tailscale" (100.x.x.x)
+bind = "local"
+
+# Shared-secret for token-based auth (generated via: openssl rand -hex 32)
+auth_token = ""
+
+[[tools]]
+name = "nmap"
+binary_path = "/usr/bin/nmap"
+enabled = true
+default_args = ["-sV", "-T2", "--top-ports", "100"]
+timeout_seconds = 300
+max_output_kb = 64
+
+[[tools]]
+name = "whatweb"
+binary_path = "/usr/bin/whatweb"
+enabled = true
+default_args = ["--no-geoip", "--log-verbose=0"]
+timeout_seconds = 60
+max_output_kb = 64
+
+[[tools]]
+name = "dns"
+binary_path = "/usr/bin/dig"
+enabled = true
+default_args = ["+short"]
+timeout_seconds = 30
+max_output_kb = 64
+
+[[tools]]
+name = "nslookup"
+binary_path = "/usr/bin/nslookup"
+enabled = true
+default_args = []
+timeout_seconds = 30
+max_output_kb = 64
+
+[[tools]]
+name = "curl"
+binary_path = "/usr/bin/curl"
+enabled = true
+default_args = ["-sS"]
+timeout_seconds = 60
+max_output_kb = 64
+
+[[tools]]
+name = "subfinder"
+binary_path = "/usr/bin/subfinder"
+enabled = true
+default_args = ["-silent"]
+timeout_seconds = 120
+max_output_kb = 64
+
+[[tools]]
+name = "dirb"
+binary_path = "/usr/bin/dirb"
+enabled = true
+default_args = ["-w", "/usr/share/dirb/wordlists/small.txt"]
+timeout_seconds = 180
+max_output_kb = 64
+
+[[tools]]
+name = "nikto"
+binary_path = "/usr/bin/nikto"
+enabled = true
+default_args = ["-Tuning", "123b"]
+timeout_seconds = 300
+max_output_kb = 64
+
+[[tools]]
+name = "ssl"
+binary_path = "/usr/bin/sslscan"
+enabled = true
+default_args = []
+timeout_seconds = 120
+max_output_kb = 64
+
+[[tools]]
+name = "dnsrecon"
+binary_path = "/usr/bin/dnsrecon"
+enabled = true
+default_args = ["-t", "A,AAAA,MX,NS,SOA"]
+timeout_seconds = 120
+max_output_kb = 64
+
+# Allowlisted extra flags that MCP clients may layer on top of default_args.
+# Any flag not in this list will be rejected at submission time.
+[[tools.allowlisted_flags]]
+  name = "nmap"
+  flags = ["-p", "--top-ports", "--script", "-sS", "-sV", "-A", "-oA", "-oX"]
+
+[[tools.allowlisted_flags]]
+  name = "whatweb"
+  flags = ["-v", "--log-verbose", "--no-geoip"]
+
+[[tools.allowlisted_flags]]
+  name = "dns"
+  flags = ["-x", "+trace", "+noall", "+answer"]
+
+[[tools.allowlisted_flags]]
+  name = "curl"
+  flags = ["-i", "-I", "-s", "-sS", "-o", "--connect-timeout", "--max-time"]
+
+[[tools.allowlisted_flags]]
+  name = "subfinder"
+  flags = ["-silent", "-recursive", "-depth", "-t", "-timeout"]
+
+[[tools.allowlisted_flags]]
+  name = "dirb"
+  flags = ["-X", "-S", "-e", "-r", "-"]
+
+[[tools.allowlisted_flags]]
+  name = "nikto"
+  flags = ["-Tuning", "-verbose", "-output", "-Format", "-Display"]
+
+[[tools.allowlisted_flags]]
+  name = "ssl"
+  flags = ["-H", "-U", "-N", "-E", "-X", "-S", "-R", "-"]
+
+[system]
+# Rotating log config
+log_file = "/var/log/mcp-server.log"
+log_max_bytes = 1048576    # 1 MB
+log_backup_count = 5       # keep 5 rotated files
+# RAM guard: reject jobs if free memory falls below this threshold (MB)
+ram_threshold_mb = 100
+
+[job_queue]
+max_concurrent = 1         # single-slot queue
+job_state_file = "/var/lib/mcp-server/jobs.sqlite"
